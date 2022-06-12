@@ -17,59 +17,48 @@ class Foo {
 
 #define N 20
 
-#define ns std
+#define ns ft
 typedef int key;
-typedef std::string value;
+typedef int value;
 
 #define putv(v) std::cout << "v: "; for(ns::vector<type>::iterator it = v.begin(); it != v.end(); it++) std::cout << *it << " "; std::cout << "(" << v.size() << "," << v.capacity() << ")" << std::endl;
 #define putm(mp) std::cout << "map: "; for(ns::map<key,value>::iterator it = mp.begin(); it != mp.end(); it++) std::cout << "[" << it->first << "=" << it->second << "] "; std::cout << "(sz: " << mp.size() << ")" << std::endl;
+#define putit(it) std::cout << "it->val: " << it->first << " " << it->second << std::endl;
 
-template <typename T>
-std::string	printPair(const T &iterator, bool nl = true, std::ostream &o = std::cout)
-{
-	o << "key: " << iterator->first << " | value: " << iterator->second;
-	if (nl)
-		o << std::endl;
-	return ("");
+std::vector<int> permutation(int n) {
+	std::vector<int> v(n), ret;
+	for (int i = 0; i < n; i++) v[i] = i+1;
+	srand(time(NULL));
+	while (v.size()) {
+		int idx = rand()%v.size();
+		std::swap(v[idx],v.back());
+		ret.push_back(v.back()); v.pop_back();
+	}
+	return ret;
 }
 
 int main() {
 	ns::map<key,value> mp;
+	std::vector<int> v = permutation(N);
 
-	ns::vector<int> v(N);
-
-	//ft_insert(mp, T3(42, "lol"));
-	//ft_insert(mp, T3(42, "mdr"));
-	//ft_insert(mp, T3(50, "mdr"));
-	//ft_insert(mp, T3(35, "funny"));
-	//ft_insert(mp, T3(45, "bunny"));
-
-	ns::pair<ns::map<key,value>::const_iterator, bool> ret;
-
-
-	//ret = mp.insert(ns::make_pair(42,"lol"));
-	//printPair(ret.first);
-	//ret = mp.insert(ns::make_pair(42,"mdr"));
-	//printPair(ret.first);
-	//ret = mp.insert(ns::make_pair(50,"mdr"));
-	//printPair(ret.first);
-	//ret = mp.insert(ns::make_pair(35,"funny"));
-	//printPair(ret.first);
-	//ret = mp.insert(ns::make_pair(45,"bunny"));
-
-	//ret = mp.insert(ns::make_pair(45,"e"));
-	//printPair(ret.first);
-
+	for (int i=0; i < (int)v.size(); i++) mp.insert(ns::make_pair(v[i], 42));
+	putm(mp);
+	for (int i=0; i < (int)v.size(); i++)  {
+		mp.erase(v[i]);
+		putm(mp);
+	}
+	for (int i=0; i < (int)v.size(); i++) mp.insert(ns::make_pair(v[i], 42));
 
 	putm(mp);
+	mp.insert(ns::make_pair(21,0));
+	putm(mp);
 
-	ns::map<key,value>::const_iterator it = mp.begin(), ite = mp.end();
-	while (it != ite) {
-		std::cout << "[" << it->first << "," << it->second << "] ";
-		++it;
-	}
-	std::cout << std::endl;
+	ns::map<key,value>::iterator it = mp.lower_bound(-10);
 
-	//std::cout << "it == rend : " << (it == mp.rend()) << std::endl;
+	if (it == mp.end()) std::cout << "END" << std::endl;
+	else putit(it);
 
+
+
+	
 } 

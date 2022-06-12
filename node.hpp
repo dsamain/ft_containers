@@ -29,6 +29,5 @@ template<typename T, typename Alloc = std::allocator<T> >
 		}
 
 		// COPY AND ASSIGNEMENT CONSTRUCTOR SHOULD BE AVOIDED AS THEY ONLY COPY THE VAL (use val constructor)
-
 	};
 }

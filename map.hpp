@@ -6,7 +6,7 @@
 /*   By: dsamain <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 11:36:16 by dsamain           #+#    #+#             */
-/*   Updated: 2022/06/12 06:39:49 by dsamain          ###   ########.fr       */
+/*   Updated: 2022/06/12 10:22:56 by dsamain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,9 @@ namespace ft {
 		typename Alloc = std::allocator<ft::pair<const Key,T> > >
 	class map {
 	public:
-			/*		Member type		*/
+
+	/*------------------Member type------------------*/
+
 		typedef Key key_type;
 		typedef T mapped_type;
 		typedef ft::pair<const key_type, mapped_type> value_type;
@@ -39,7 +41,7 @@ namespace ft {
 		typedef typename allocator_type::pointer pointer;
 		typedef typename allocator_type::pointer const_pointer;
 		typedef long difference_type;
-		typedef long size_type;
+		typedef unsigned long size_type;
 		class value_compare {
 			friend class map;
 		public:
@@ -59,10 +61,12 @@ namespace ft {
 
 		/*#######################################################################*/
 
-				/*		*structor		*/
+
+	/*------------------Constructor------------------*/
+
 		explicit map(const key_compare &comp = key_compare(),
               const allocator_type &alloc = allocator_type())
-		: _size(0), _alloc(alloc), _first(0, value_type()), _last(0, value_type()), _key_comp(comp), _comp(comp) {
+		: _size(0), _alloc(alloc), _first(0, value_type()), _last(0, value_type()), _keyComp(comp), _comp(comp) {
 			_root = &_last;
 
 		}		
@@ -71,12 +75,12 @@ namespace ft {
   		map (InputIterator first, InputIterator last,
        const key_compare& comp = key_compare(),
        const allocator_type& alloc = allocator_type())
-	   : _size(0), _alloc(alloc), _first(0, value_type()), _last(0, value_type()), _key_comp(comp), _comp(comp) {
+	   : _size(0), _alloc(alloc), _first(0, value_type()), _last(0, value_type()), _keyComp(comp), _comp(comp) {
 			insert(first, last);
 	   }
 
 		map(const map &cpy)
-		: _size(0), _alloc(cpy._alloc), _first(0, value_type()), _last(0, value_type()), _key_comp(cpy._key_comp), _comp(cpy._comp) {
+		: _size(0), _alloc(cpy._alloc), _first(0, value_type()), _last(0, value_type()), _keyComp(cpy._keyComp), _comp(cpy._comp) {
 			_root = &_last;
 			this->insert(cpy.begin(), cpy.end());
 		}
@@ -84,7 +88,7 @@ namespace ft {
 		~map() {destruct(_root);}
 
 		map& operator=(const map& cpy) { 
-			_key_comp = cpy._key_comp;
+			_keyComp = cpy._keyComp;
 			_comp = cpy._comp;
 			this->clear();
 			this->insert(cpy.begin(), cpy.end());
@@ -93,7 +97,8 @@ namespace ft {
 
 		allocator_type get_allocator() const {return allocator_type();}
 
-		// Iterator	
+	/*------------------Iterator------------------*/
+
 		iterator end() {return iterator(&_last, &_first, &_last);}
 		const_iterator end() const {return const_iterator(&_last, &_first, &_last);}
 
@@ -114,7 +119,9 @@ namespace ft {
 		reverse_iterator rend() {return reverse_iterator(begin());}
 		const_reverse_iterator rend() const {return const_reverse_iterator(begin());}
 
-				/*		Capacity		*/
+
+	/*------------------Capacity------------------*/
+
 		bool empty() const {return (!_size);}
 
 		size_type size() const {return _size;}
@@ -133,17 +140,18 @@ namespace ft {
 			return tmp.max_size();
 		}
 
-				/*		Modifiers		*/
+
+	/*------------------Element Acces------------------*/
+
+	//mapped_type& operator[] (const key_type& k) {
+		//return insert()
+	//}
+
+	/*------------------Modifiers------------------*/
+
 		ft::pair<iterator, bool> insert(const value_type &val) {
-			if (!_size) {
-				_last.par = _nodeAlloc.allocate(1);
-				_nodeAlloc.construct(_last.par, val);
-				_root = _last.par;
-				_root->right = &_last;
-				_root->left = &_first;
-				_size++;
-				return ft::make_pair(iterator(_root, &_first, &_last), (bool)1);
-			}
+			if (!_size)
+				return ft::make_pair(iterator(insertLeafNode(NULL, val), &_first, &_last), (bool)1);
 			nodePtr cur = _root, prev;
 			while (cur && cur != &_last && cur != &_first) {
 				prev = cur;
@@ -152,20 +160,7 @@ namespace ft {
 				if (_comp(val, *cur->val)) cur = cur->left;
 				else cur = cur->right;
 			}
-			nodePtr tmp = _nodeAlloc.allocate(1);		
-			_nodeAlloc.construct(tmp, val);
-			if (_comp(val, *prev->val)) prev->left = tmp;
-			else prev->right = tmp;
-			tmp->par = prev;
-			if (cur == &_last) {
-				_last.par = tmp;
-				tmp->right = &_last;
-			} else if (cur == &_first) {
-				_first.par = tmp;
-				tmp->left = &_first;
-			}
-			_size++;
-			return ft::make_pair(iterator(tmp, &_first, &_last), (bool)1);
+			return ft::make_pair(iterator(insertLeafNode(prev, val), &_first, &_last), (bool)1);
 		}
 
 		iterator insert (iterator position, const value_type& val) {
@@ -192,68 +187,25 @@ namespace ft {
 		void erase (iterator position) {erase(position->first);}
 
 		size_type erase( const Key& key ) {
-			if (!_size) return 0;
 			nodePtr cur = _root;
+
 			while (cur && cur->val->first != key && cur != &_first && cur != &_last) {
-				if (_key_comp(key, cur->val->first)) cur = cur->left;
-				else cur = cur->right;
-			}
-			if (!cur || cur == &_first || cur == &_last) return 0;
-			if ((cur->left && cur->left != &_first) && (cur->right && cur->right != &_last)) {
-				//std::cout << "case3" << std::endl;
-				nodePtr suc = cur->right;
-				while (suc->left && suc->left != &_first)
-					suc = suc->left;
-				ft::swap(suc->val, cur->val);
-				cur = suc;
+				if (_keyComp(key, cur->val->first))
+					cur = cur->left;
+				else
+					cur = cur->right;
 			}
 
-			if ((!cur->left || cur->left == &_first) && (!cur->right || cur->right == &_last)) {
-				//std::cout << "case1" << std::endl;
-				if (cur->par) {
-					if (cur->par->left == cur)
-						cur->par->left = cur->left;
-					if (cur->par->right == cur)
-						cur->par->right = cur->right;
-				}
-				if (cur->left) cur->left->par = cur->par;
-				if (cur->right) cur->right->par = cur->par;
-				if (_root == cur) _root = &_last;
-				_nodeAlloc.destroy(cur);
-				_nodeAlloc.deallocate(cur,1);
+			if (!cur || cur == &_first || cur == &_last) return 0;
+
+			if ((cur->left && cur->left != &_first) && (cur->right && cur->right != &_last)) { // if node have two children, find successor and swap (should not affect nodes color)
+				nodePtr successor = cur->right;
+				while (successor->left && successor->left != &_first)
+					successor = successor->left;
+				ft::swap(successor->val, cur->val);
+				cur = successor;
 			}
-			else if ((cur->left && cur->left != &_first) || (cur->right && cur->right != &_last)) {
-				//std::cout << "case2\n";
-				nodePtr newChild;
-				if (cur->left && cur->left != &_first)
-					newChild = cur->left;
-				else
-					newChild = cur->right;
-				newChild->par = cur->par;
-				if (cur->par) {
-					if (cur->par->left == cur) cur->par->left = newChild;
-					else cur->par->right = newChild;
-				}
-				if (_root == cur) _root = newChild;
-				//replace _first && _last
-				if (_first.par == cur) {
-					nodePtr p = _root;
-					while (p->left && p->left != &_first) 
-						p = p->left;
-					_first.par = p;
-					p->left = &_first;
-				}
-				if (_last.par == cur) {
-					nodePtr p = _root;
-					while (p->right && p->right != &_last)
-						p = p->right;
-					_last.par = p;
-					p->right = &_last;
-				}
-				_nodeAlloc.destroy(cur);
-				_nodeAlloc.deallocate(cur,1);
-			} 
-			_size--;
+			eraseNode(cur);
 			return 1;
 		}
 
@@ -267,31 +219,64 @@ namespace ft {
 			_size = 0;
 		}
 
+	/*------------------Finder------------------*/
+
+	iterator find (const key_type& k) {
+		iterator ret = lower_bound(k);
+		return (ret == end() || ret->first != k ? end() : ret);
+	}
+
+	const_iterator find (const key_type& k) const {
+		const_iterator ret = lower_bound(k);
+		return (ret == end() || ret->first != k ? end() : ret);
+	}
+
+	size_type count (const key_type& k) const {
+		return (find(k) != end());
+	}
+
+	iterator lower_bound (const key_type& k) {
+		nodePtr cur = _root, res = NULL;
+		while (cur)
+			if (_keyComp(cur->val->first, k))
+				cur = cur->right;
+			else
+				res = cur, cur = cur->left;
+		return (res ? iterator(res, &_first, &_last) : end());
+	}
+
+
+	const_iterator lower_bound (const key_type& k) const {
+		nodePtr cur = _root, res = NULL;
+		while (cur && cur != &_first && cur != &_last)
+			if (_keyComp(cur->val->first, k))
+				cur = cur->right;
+			else
+				res = cur, cur = cur->left;
+		return (res ? const_iterator(res, &_first, &_last) : end());
+	}
+
+	iterator upper_bound (const key_type& k) {
+		iterator ret = lower_bound(k);
+		if (ret != end() && ret->first == k) ++ret;
+		return ret;
+	}
+	const_iterator upper_bound (const key_type& k) const {
+		const_iterator ret = lower_bound(k);
+		if (ret != end() && ret->first == k) ++ret;
+		return ret;
+	}
+
+	pair<iterator,iterator>             equal_range (const key_type& k) {
+		return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));
+	}
+	pair<const_iterator,const_iterator> equal_range (const key_type& k) const  {
+		return ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k));
+	}
+
 
 	private:
-
-			/* Private member type */
-		typedef node<value_type>* nodePtr;
-
-
-			/* Private function */
-		void destruct(nodePtr cur) {
-			if (!cur || cur == &_first || cur == &_last) return;
-			destruct(cur->left);
-			destruct(cur->right);
-			_nodeAlloc.destroy(cur);
-			_nodeAlloc.deallocate(cur, 1);
-		}
-
-		void nodeValueSwap(nodePtr x, nodePtr y) {
-			ft::swap(x->par, y->par);
-			ft::swap(x->left, y->left);
-			ft::swap(x->right, y->right);
-			ft::swap(x->col, y->col);
-
-		}
-
-			/* Atributs */
+		// Attribut
 		size_type _size;
 		size_type _max_size;
 		Alloc _alloc;
@@ -299,8 +284,110 @@ namespace ft {
 		node<value_type> _first;
 		node<value_type> _last;
 		node<value_type> *_root;
-		key_compare _key_comp;
+		key_compare _keyComp;
 		value_compare _comp;
+
+		// Private member type
+		typedef node<value_type>* nodePtr;
+
+
+		// Private function
+		nodePtr newNode(const value_type &val) {
+			nodePtr ret = _nodeAlloc.allocate(1);
+			_nodeAlloc.construct(ret, val);
+			return ret;
+		}
+
+		void deleteNode(nodePtr nd) {
+			_nodeAlloc.destroy(nd);
+			_nodeAlloc.deallocate(nd, 1);
+		}
+
+		nodePtr insertLeafNode(nodePtr par, const value_type &val) {
+			if (par && ((par->left && par->left != &_first) && (par->right && par->right != &_last))) return NULL; // should be ok if remove (check if node will be leaf)
+			nodePtr nd = newNode(val);
+			if (!par) {
+				_root = nd;
+				_last.par = _root;
+				_root->right = &_last;
+				_first.par = _root;
+				_root->left = &_first;
+				_size++;
+				return _root;
+			} else {
+				if (_comp(*par->val, *nd->val)) {
+					if (par->right == &_last) {
+						_last.par = nd;
+						nd->right = &_last;
+					}
+					par->right = nd;
+				} else {
+					if (par->left == &_first) {
+						_first.par = nd;
+						nd->left = &_first;
+					}
+					par->left = nd;
+				}
+				nd->par = par;
+			}
+			_size++;
+			return nd;
+		}
+
+		void eraseNode(nodePtr nd) {
+			if ((!nd->left || nd->left == &_first) && (!nd->right || nd->right == &_last)) { // 0 child case
+				if (nd->par) {
+					if (nd->par->left == nd)
+						nd->par->left = nd->left;
+					if (nd->par->right == nd)
+						nd->par->right = nd->right;
+				}
+				if (nd->left) nd->left->par = nd->par;
+				if (nd->right) nd->right->par = nd->par;
+				if (_root == nd) _root = &_last;
+			} else if ((nd->left && nd->left != &_first) || (nd->right && nd->right != &_last)) { // 1 child case
+				//std::cout << "case2\n";
+				nodePtr newChild;
+				if (nd->left && nd->left != &_first)
+					newChild = nd->left;
+				else
+					newChild = nd->right;
+				newChild->par = nd->par;
+				if (nd->par) {
+					if (nd->par->left == nd) nd->par->left = newChild;
+					else nd->par->right = newChild;
+				}
+				if (_root == nd) _root = newChild;
+				//replace _first && _last
+				if (_first.par == nd) {
+					nodePtr p = _root;
+					while (p->left && p->left != &_first) 
+						p = p->left;
+					_first.par = p;
+					p->left = &_first;
+				}
+				if (_last.par == nd) {
+					nodePtr p = _root;
+					while (p->right && p->right != &_last)
+						p = p->right;
+					_last.par = p;
+					p->right = &_last;
+				}
+			}
+			deleteNode(nd);
+			_size--;
+		}
+
+		void destruct(nodePtr cur) {
+			if (!cur || cur == &_first || cur == &_last) return;
+			destruct(cur->left);
+			destruct(cur->right);
+			deleteNode(cur);
+		}
+
+		
+
+
 		
 
 

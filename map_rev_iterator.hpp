@@ -4,7 +4,7 @@
 
 namespace ft {
 
-		template<typename Iter>
+		template<typename Iter, typename CIter>
 	class map_rev_iterator {
 	public:
 
@@ -52,6 +52,10 @@ namespace ft {
 		// Comparaison
 		friend bool operator==(const map_rev_iterator &x, const map_rev_iterator &y) {return (x._it == y._it);}
 		friend bool operator!=(const map_rev_iterator &x, const map_rev_iterator &y) {return (x._it != y._it);}
+
+		operator Iter() {
+			return _it;
+		}
 
 	private:
 		iterator_type _it;

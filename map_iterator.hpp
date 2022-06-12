@@ -86,6 +86,11 @@ namespace ft {
 		friend bool operator==(const map_iterator &x, const map_iterator &y) {return (x._ptr == y._ptr);}
 		friend bool operator!=(const map_iterator &x, const map_iterator &y) {return (x._ptr != y._ptr);}
 
+		operator map_iterator<Key, T, Compare, Alloc, Node, 1> () {
+			map_iterator<Key, T, Compare, Alloc, Node, 1> ret(_ptr, _first, _last);
+			return ret;
+		}
+
 	private:
 			/* Atribute */
 		nodePtr _ptr;
