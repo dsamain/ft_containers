@@ -7,8 +7,12 @@ namespace ft {
     template<typename Iterator>
     class vector_rev_iterator {
     public:
-        /*      ALIAS       */
-
+	/*------------------Conversion------------------*/
+	/*------------------Comparaison------------------*/
+	/*------------------Increment------------------*/
+	/*------------------Access------------------*/
+	/*------------------Constructor------------------*/
+	/*------------------Member type------------------*/
 		typedef Iterator iterator_type;
         typedef typename Iterator::value_type value_type;
         typedef typename Iterator::difference_type difference_type;

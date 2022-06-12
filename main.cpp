@@ -58,7 +58,8 @@ int main() {
 	if (it == mp.end()) std::cout << "END" << std::endl;
 	else putit(it);
 
-
+	mp[42] = 909;
+	std::cout << mp[42] << std::endl;
 
 	
 } 

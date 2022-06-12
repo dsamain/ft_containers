@@ -9,18 +9,20 @@ namespace ft {
 	class map_iterator {
 	public:
 
-				/*		Member type		*/
+	/*------------------Member type------------------*/
+
 		typedef std::bidirectional_iterator_tag iterator_category;
 		typedef ft::pair<const Key, T> value_type;
 		typedef long difference_type;
 		typedef typename ft::isConst<b, value_type&, const value_type&>::type reference;
 		typedef typename ft::isConst<b, value_type*, const value_type*>::type pointer;
 	private:
-		//typedef Node* nodePtr;
 		typedef typename ft::isConst<b, Node*, const Node*>::type nodePtr;
 	public:
 
-				/*		Constructor		*/
+
+	/*------------------Constructor------------------*/
+
 		map_iterator(const nodePtr ptr=NULL, const nodePtr first=NULL, const nodePtr last=NULL)
 		: _ptr(ptr), _first(first), _last(last), _comp(Compare()) {}
 
@@ -37,20 +39,23 @@ namespace ft {
 
 		~map_iterator() {}
 
-		// Access
+		
+	/*------------------Access------------------*/
+
 		reference operator*() const {return *_ptr->val;}
 		pointer operator->() const {return &(**this);}
 
-		// Increment
+
+	/*------------------Increment------------------*/
+
 		map_iterator &operator++() {
 			if (_ptr->right) {
 				_ptr = _ptr->right;
 				while (_ptr->left) _ptr = _ptr->left;
 			} else {
 				value_type cur_val = *_ptr->val;	
-				while (!_comp(cur_val.first, _ptr->val->first)) {
+				while (!_comp(cur_val.first, _ptr->val->first))
 					_ptr = _ptr->par;
-				}
 			}
 			return *this;
 		}
@@ -69,9 +74,8 @@ namespace ft {
 				while (_ptr->right) _ptr = _ptr->right;
 			} else {
 				value_type cur_val = *_ptr->val;	
-				while (!_comp(_ptr->val->first, cur_val.first)) {
+				while (!_comp(_ptr->val->first, cur_val.first))
 					_ptr = _ptr->par;
-				}
 			}
 			return *this;
 		}
@@ -82,9 +86,14 @@ namespace ft {
             return out;
 		}
 
-		// Comparaison
+
+	/*------------------Comparaison------------------*/
+
 		friend bool operator==(const map_iterator &x, const map_iterator &y) {return (x._ptr == y._ptr);}
 		friend bool operator!=(const map_iterator &x, const map_iterator &y) {return (x._ptr != y._ptr);}
+
+
+	/*------------------Conversion------------------*/
 
 		operator map_iterator<Key, T, Compare, Alloc, Node, 1> () {
 			map_iterator<Key, T, Compare, Alloc, Node, 1> ret(_ptr, _first, _last);
@@ -92,7 +101,6 @@ namespace ft {
 		}
 
 	private:
-			/* Atribute */
 		nodePtr _ptr;
 		nodePtr _first;
 		nodePtr _last;

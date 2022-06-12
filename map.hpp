@@ -6,7 +6,7 @@
 /*   By: dsamain <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 11:36:16 by dsamain           #+#    #+#             */
-/*   Updated: 2022/06/12 10:22:56 by dsamain          ###   ########.fr       */
+/*   Updated: 2022/06/12 11:43:35 by dsamain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,6 @@ namespace ft {
 			return *this;
 		}
 
-		allocator_type get_allocator() const {return allocator_type();}
-
 	/*------------------Iterator------------------*/
 
 		iterator end() {return iterator(&_last, &_first, &_last);}
@@ -143,9 +141,9 @@ namespace ft {
 
 	/*------------------Element Acces------------------*/
 
-	//mapped_type& operator[] (const key_type& k) {
-		//return insert()
-	//}
+	mapped_type& operator[] (const key_type& k) {
+		return (*((insert(ft::make_pair(k,mapped_type()))).first)).second ;
+	}
 
 	/*------------------Modifiers------------------*/
 
@@ -171,18 +169,6 @@ namespace ft {
 
 		template <class InputIterator>
   		void insert (InputIterator first, InputIterator last) {while (first != last) insert(*first++);}
-
-		/*
-			add _begin to insert and keep it like this[X]
-			make val a pointer in node so it's value can be swapped
-			finish iterator
-			test insert
-			add rbt recoloring and rotation at the end of insert
-			add search operation 
-			then ~= done
-		*/
-
-		// find node then swap node until it has no more than one child
 
 		void erase (iterator position) {erase(position->first);}
 
@@ -211,6 +197,19 @@ namespace ft {
 
 		void erase (iterator first, iterator last) {while (first != last) erase(first++);}
 
+		void swap (map &x) {
+			ft::swap(_root, x._root);
+			ft::swap(_first.par, x._first.par);	
+			_first.par->left = &_first;
+			x._first.par->left = &x._first;
+			ft::swap(_last.par, x._last.par);	
+			_last.par->right = &_last;
+			x._last.par->right = &x._last;
+			ft::swap(_size, x._size);
+		}
+
+		friend void swap (map &x, map &y) {x.swap(y);}
+
 		void clear() {
 			destruct(_root);
 			_last.par = NULL;
@@ -218,6 +217,13 @@ namespace ft {
 			_root = &_last;
 			_size = 0;
 		}
+
+
+	/*------------------Observers------------------*/
+
+	key_compare key_comp() const {return _keyComp;}
+	value_compare value_comp() const {return _comp;}
+
 
 	/*------------------Finder------------------*/
 
@@ -231,9 +237,7 @@ namespace ft {
 		return (ret == end() || ret->first != k ? end() : ret);
 	}
 
-	size_type count (const key_type& k) const {
-		return (find(k) != end());
-	}
+	size_type count (const key_type& k) const {return (find(k) != end());}
 
 	iterator lower_bound (const key_type& k) {
 		nodePtr cur = _root, res = NULL;
@@ -244,7 +248,6 @@ namespace ft {
 				res = cur, cur = cur->left;
 		return (res ? iterator(res, &_first, &_last) : end());
 	}
-
 
 	const_iterator lower_bound (const key_type& k) const {
 		nodePtr cur = _root, res = NULL;
@@ -267,18 +270,32 @@ namespace ft {
 		return ret;
 	}
 
-	pair<iterator,iterator>             equal_range (const key_type& k) {
-		return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));
-	}
-	pair<const_iterator,const_iterator> equal_range (const key_type& k) const  {
-		return ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k));
+	pair<iterator,iterator>             equal_range (const key_type& k) {return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));}
+	pair<const_iterator,const_iterator> equal_range (const key_type& k) const  {return ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k));}
+
+	/*------------------Allocator------------------*/
+
+	allocator_type get_allocator() const;
+
+	/*------------------Comparaison------------------*/
+
+	friend bool operator==(const map &l, const map &r) {
+		const_iterator it = l.begin();
+		const_iterator it2 = r.begin();
+		while (it != l.end())
+			if (*it++ != *it2++)
+				return 0;
+		return (it2 == r.end());
 	}
 
+	friend bool operator!=(const map &l, const map &r) {return !(l == r);}
+	friend bool operator<(const map &l, const map &r) {return ft::lexicographical_compare(l.begin(), l.end(), r.begin(), r.end());}
+	friend bool operator<=(const map &l, const map &r) {return (l < r || l == r);}
+	friend bool operator>(const map &l, const map &r) {return ft::lexicographical_compare(r.begin(), r.end(), l.begin(), l.end());}
+	friend bool operator>=(const map &l, const map &r) {return (l > r || l == r);}
 
 	private:
-		// Attribut
 		size_type _size;
-		size_type _max_size;
 		Alloc _alloc;
 		std::allocator<node<value_type> > _nodeAlloc;
 		node<value_type> _first;
