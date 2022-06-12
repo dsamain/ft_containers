@@ -4,7 +4,7 @@
 
 namespace ft {
 
-		template<typename Iter, typename CIter>
+		template<typename Iter>
 	class map_rev_iterator {
 	public:
 
