@@ -23,15 +23,14 @@ namespace ft {
 
 	/*------------------Constructor------------------*/
 
-		map_iterator(const nodePtr ptr=NULL, const nodePtr first=NULL, const nodePtr last=NULL)
-		: _ptr(ptr), _first(first), _last(last), _comp(Compare()) {}
+		map_iterator(const nodePtr ptr=NULL, const nodePtr last=NULL)
+		: _ptr(ptr), _last(last), _comp(Compare()) {}
 
 		map_iterator(const map_iterator &cpy)
-		: _ptr(cpy._ptr), _first(cpy._first), _last(cpy._last), _comp(cpy._comp) {}
+		: _ptr(cpy._ptr), _last(cpy._last), _comp(cpy._comp) {}
 
 		map_iterator &operator=(const map_iterator &cpy) {
 			_ptr = cpy._ptr;
-			_first = cpy._first;
 			_last = cpy._last;
 			_comp = cpy._comp;
 			return *this;
@@ -96,13 +95,12 @@ namespace ft {
 	/*------------------Conversion------------------*/
 
 		operator map_iterator<Key, T, Compare, Alloc, Node, 1> () {
-			map_iterator<Key, T, Compare, Alloc, Node, 1> ret(_ptr, _first, _last);
+			map_iterator<Key, T, Compare, Alloc, Node, 1> ret(_ptr, _last);
 			return ret;
 		}
 
 	private:
 		nodePtr _ptr;
-		nodePtr _first;
 		nodePtr _last;
 		Compare _comp;
 	};

@@ -1,0 +1,5 @@
+- create tree class and use it with map (to avoid redundant code with set)
+- make a general reverse_iterator
+- set
+- stack
+- tester

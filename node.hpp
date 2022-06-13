@@ -27,7 +27,5 @@ template<typename T, typename Alloc = std::allocator<T> >
 			alloc.destroy(val);
 			alloc.deallocate(val, 1);
 		}
-
-		// COPY AND ASSIGNEMENT CONSTRUCTOR SHOULD BE AVOIDED AS THEY ONLY COPY THE VAL (use val constructor)
 	};
 }
