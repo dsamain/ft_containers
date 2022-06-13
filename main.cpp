@@ -8,8 +8,9 @@
 #include "vector.hpp"
 #include "template_utils.hpp"
 #include <random>
-#include "node.hpp"
 #include <time.h>
+#include "node.hpp"
+#include "pair.hpp"
 
 template<typename T>
 class Foo {
@@ -72,7 +73,8 @@ int main() {
 	std::cout << "begin : " << mp.begin()->first << " " << mp.begin()->second << std::endl;
 	//std::cout << "rend : " << mp.rend()->first << " " << mp.rend()->second << std::endl;
 	
-
+	ft::node<ft::pair<const int, int>> nd;
+	ft::node<ft::pair<const int, int>> nd2;
 
 	
 } 

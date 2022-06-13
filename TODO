@@ -1,4 +1,4 @@
-- create tree class and use it with map (to avoid redundant code with set)
+- finish tree and reimplement map
 - make a general reverse_iterator
 - set
 - stack
