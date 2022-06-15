@@ -1,11 +1,9 @@
 #pragma once
 
-#include "pair.hpp"
-#include "bidirectional_iterator.hpp"
-#include "map_rev_iterator.hpp"
+#include "./iterator/bidirectional_iterator.hpp"
+#include "./iterator/reverse_iterator.hpp"
 #include "template_utils.hpp"
 #include "algorithm.hpp"
-#include <math.h>
 
 namespace ft {
 
@@ -56,19 +54,21 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 		typedef bidirectional_iterator<value_type, Compare, Alloc, node<value_type>, 0> iterator;
 		typedef bidirectional_iterator<value_type, Compare, Alloc, node<value_type>, 1> const_iterator;
-		typedef map_rev_iterator<iterator> reverse_iterator;
-		typedef map_rev_iterator<const_iterator> const_reverse_iterator;	
+		//typedef map_rev_iterator<iterator> reverse_iterator;
+		//typedef map_rev_iterator<const_iterator> const_reverse_iterator;	
+		typedef rev_iterator<iterator> reverse_iterator;
+		typedef rev_iterator<const_iterator> const_reverse_iterator;	
 
 
 	/*------------------Constructor------------------*/
 
-		explicit tree() 
-		: _size(0), _alloc(allocator_type()), _last(0, value_type()),  _comp(value_compare()) {
+		explicit tree(const value_compare &comp) 
+		: _size(0), _alloc(allocator_type()), _nodeAlloc(std::allocator<node<value_type> >()), _last(0, value_type()), _comp(comp) {
 			_root = &_last;
 		}		
 
 		tree(const tree &cpy)
-		: _size(0), _alloc(cpy._alloc), _last(0, value_type()), _comp(cpy._comp) {
+		: _size(0), _alloc(cpy._alloc), _nodeAlloc(cpy._nodeAlloc), _last(0, value_type()), _comp(cpy._comp) {
 			_root = &_last;
 			this->insert(cpy.begin(), cpy.end());
 		}
@@ -78,7 +78,8 @@ template<typename T, typename Alloc = std::allocator<T> >
 		tree& operator=(const tree& cpy) { 
 			_comp = cpy._comp;
 			this->clear();
-			this->insert(cpy.begin(), cpy.end());
+			for (iterator &it = cpy.begin(); it != cpy.end(); ++it)
+				this->insert(*it);
 			return *this;
 		}
 		
@@ -153,7 +154,8 @@ template<typename T, typename Alloc = std::allocator<T> >
 			while (cur && cur != &_last) {
 				prev = cur;
 				if (_comp(val, *cur->val)) cur = cur->left;
-				else cur = cur->right;
+				else if (_comp(*cur->val, val)) cur = cur->right;
+				else return ft::make_pair(iterator(cur, &_last), (bool)0);
 			}
 			return ft::make_pair(iterator(insertLeafNode(prev, val), &_last), (bool)1);
 		}
@@ -210,11 +212,12 @@ template<typename T, typename Alloc = std::allocator<T> >
 			else if (nd->right && nd->right != &_last)
 				newChild = nd->right;
 
-			if (nd->par)
+			if (nd->par) {
 				if (nd->par->left == nd)
 					nd->par->left = newChild;
 				else
 					nd->par->right = newChild;
+			}
 
 			if (newChild) newChild->par = nd->par;
 
@@ -259,13 +262,48 @@ template<typename T, typename Alloc = std::allocator<T> >
 	
 	/*------------------Finder------------------*/
 
-	nodePtr findNode(const value_type& v) const {
-		nodePtr cur = _root;
-		while (cur && cur != &_last)
-			if (isEqual(*cur->val, v))
-				return cur;
-			else 
-				cur = (_comp(*cur->val, v) ? cur->left : cur->right);
+	iterator find (const value_type& v) {
+		iterator ret = lower_bound(v);
+		return (ret == end() || !isEqual(*ret, v) ? end() : ret);
+	}
+
+	const_iterator find (const value_type& v) const {
+		const_iterator ret = lower_bound(v);
+		return (ret == end() || !isEqual(*ret, v) ? end() : ret);
+	}
+
+	iterator lower_bound (const value_type& v) {
+		nodePtr cur = _root, res = NULL;
+		while (cur && cur != &_last) {
+			if (_comp(*cur->val, v))
+				cur = cur->right;
+			else
+				res = cur, cur = cur->left;
+		}
+		return ((res && res != &_last) ? iterator(res, &_last) : end());
+	}
+
+	const_iterator lower_bound (const value_type& v) const {
+		nodePtr cur = _root, res = NULL;
+		while (cur && cur != &_last) {
+			if (_comp(*cur->val, v))
+				cur = cur->right;
+			else
+				res = cur, cur = cur->left;
+		}
+		return ((res && res != &_last) ? const_iterator(res, &_last) : end());
+	}
+
+	iterator upper_bound (const value_type& v) {
+		iterator ret = lower_bound(v);
+		if (ret != end() && isEqual(*ret, v)) ++ret;
+		return ret;
+	}
+
+	const_iterator upper_bound (const value_type& v) const {
+		const_iterator ret = lower_bound(v);
+		if (ret != end() && isEqual(*ret, v)) ++ret;
+		return ret;
 	}
 
 

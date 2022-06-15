@@ -1,5 +1,6 @@
-- finish tree and reimplement map
-- make a general reverse_iterator
+- fix rite_eq_op
+- red black tree
+- iterator traits
 - set
 - stack
 - tester

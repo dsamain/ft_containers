@@ -1,7 +1,7 @@
 #pragma once
 
-#include "node.hpp"
-#include "template_utils.hpp"
+#include "../tree.hpp"
+#include "../template_utils.hpp"
 
 namespace ft {
 

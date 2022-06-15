@@ -9,7 +9,7 @@
 #include "template_utils.hpp"
 #include <random>
 #include <time.h>
-#include "node.hpp"
+//#include "node.hpp"
 #include "pair.hpp"
 
 template<typename T>
@@ -41,6 +41,8 @@ std::vector<int> permutation(int n) {
 
 int main() {
 	ns::map<key,value> mp;
+
+	
 	std::vector<int> v = permutation(N);
 
 	for (int i=0; i < (int)v.size(); i++) mp.insert(ns::make_pair(v[i], 42));
@@ -52,29 +54,7 @@ int main() {
 	for (int i=0; i < (int)v.size(); i++) mp.insert(ns::make_pair(v[i], 42));
 
 	putm(mp);
-	mp.insert(ns::make_pair(21,0));
-	putm(mp);
-
-	ns::map<key,value>::iterator it = mp.lower_bound(-10);
-
-
-	if (it == mp.end()) std::cout << "END" << std::endl;
-	else putit(it);
-
-	mp[42] = 909;
-	std::cout << mp[42] << std::endl;
-
-	ns::map<key,value>::reverse_iterator rit = mp.rbegin();
-	while (rit != mp.rend()) {
-		std::cout << rit->first << " " << rit->second << std::endl;
-		rit++;
-	}
-
-	std::cout << "begin : " << mp.begin()->first << " " << mp.begin()->second << std::endl;
-	//std::cout << "rend : " << mp.rend()->first << " " << mp.rend()->second << std::endl;
-	
-	ft::node<ft::pair<const int, int>> nd;
-	ft::node<ft::pair<const int, int>> nd2;
+	std::cout << "max size : " << mp.max_size() << std::endl;
 
 	
 } 

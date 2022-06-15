@@ -3,8 +3,8 @@
 #include "type_traits.hpp"
 #include "algorithm.hpp"
 #include "template_utils.hpp"
-#include "vector_iterator.hpp"
-#include "vector_rev_iterator.hpp"
+#include "./iterator/vector_iterator.hpp"
+#include "./iterator/reverse_iterator.hpp"
 #include <exception>
 
 namespace ft {
@@ -35,8 +35,8 @@ namespace ft {
 
         typedef typename ft::vector_iterator<T> iterator;
         typedef typename ft::vector_iterator<const T> const_iterator;
-        typedef typename ft::vector_rev_iterator<iterator> reverse_iterator;
-        typedef typename ft::vector_rev_iterator<const_iterator> const_reverse_iterator;
+        typedef typename ft::rev_iterator<iterator> reverse_iterator;
+        typedef typename ft::rev_iterator<const_iterator> const_reverse_iterator;
 
         
 
