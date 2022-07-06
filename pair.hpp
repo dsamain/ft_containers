@@ -22,8 +22,7 @@ namespace ft {
 		}
 
 		operator pair<const T1, const T2>() const {
-			pair<const T1,const T2> ret(ret.first, ret.second);
-			return ret;
+			return pair<const T1,const T2> (first, second);
 		}
 
 		~pair() {}
@@ -32,7 +31,6 @@ namespace ft {
 			swap(first, pr.first);
 			swap(second, pr.second);
 		}
-
 
 		T1 first;
 		T2 second;

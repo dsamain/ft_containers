@@ -48,7 +48,7 @@ namespace ft {
 	/*------------------Increment------------------*/
 
         vector_iterator &operator++() {
-            _ptr++;
+            ++_ptr;
             return (*this);
         }
         vector_iterator &operator--() {

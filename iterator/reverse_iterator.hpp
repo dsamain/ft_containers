@@ -33,19 +33,17 @@ namespace ft {
 		~rev_iterator() {}
 
 		iterator_type base() const {
-			iterator_type ret(_it);
-			//++ret;
-			return ret;
+			return _it;
 		}
 
 
 	/*------------------Access------------------*/
 
 		reference operator*() const {return *(--iterator_type(_it));}
+
 		pointer operator->() const {return &(this->operator*());}
-        reference operator[](difference_type n) {
-			return base()[-n-1];
-			} 
+
+        reference operator[](difference_type n) {return base()[-n-1];} 
 
 
 	/*------------------Increment------------------*/
@@ -82,22 +80,21 @@ namespace ft {
 	/*------------------Arithmetic------------------*/
 
   		rev_iterator operator+(const int & n) {
-            rev_iterator out(*this);
-            out += n;
-            return out;
+			return rev_iterator(base() - n);
         }
 
 		template<typename It>
         friend rev_iterator operator+(const int &n, const rev_iterator<It> &op) {
-            rev_iterator out(op);
-            out += n;
-            return out;
+			return rev_iterator(op.base() - n);
         }
 
-        rev_iterator operator-(const difference_type &n) {
-            rev_iterator out(*this);
-            out -= n;
-            return out;
+        rev_iterator operator-(const int &n) {
+			return rev_iterator(base() + n);
+        }
+
+		template<typename It>
+        friend rev_iterator operator-(const int &n, const rev_iterator<It> &op) {
+			return rev_iterator(op.base() + n);
         }
 
         //difference_type operator-(const rev_iterator &op) {
@@ -140,15 +137,15 @@ namespace ft {
 				const rev_iterator<It2>& rhs) {return (lhs.base() != rhs.base());}
 
 		template <typename It1, typename It2> bool operator<(const rev_iterator<It1>& lhs,
-				const rev_iterator<It2>& rhs) {return (lhs.base() < rhs.base());}
-
-		template <typename It1, typename It2> bool operator<=(const rev_iterator<It1>& lhs,
-				const rev_iterator<It2>& rhs) {return (lhs.base() <= rhs.base());}
-
-		template <typename It1, typename It2> bool operator>(const rev_iterator<It1>& lhs,
 				const rev_iterator<It2>& rhs) {return (lhs.base() > rhs.base());}
 
-		template <typename It1, typename It2> bool operator>=(const rev_iterator<It1>& lhs,
+		template <typename It1, typename It2> bool operator<=(const rev_iterator<It1>& lhs,
 				const rev_iterator<It2>& rhs) {return (lhs.base() >= rhs.base());}
+
+		template <typename It1, typename It2> bool operator>(const rev_iterator<It1>& lhs,
+				const rev_iterator<It2>& rhs) {return (lhs.base() < rhs.base());}
+
+		template <typename It1, typename It2> bool operator>=(const rev_iterator<It1>& lhs,
+				const rev_iterator<It2>& rhs) {return (lhs.base() <= rhs.base());}
 
 }

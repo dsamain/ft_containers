@@ -6,13 +6,14 @@
 /*   By: dsamain <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 11:36:16 by dsamain           #+#    #+#             */
-/*   Updated: 2022/06/15 02:57:25 by dsamain          ###   ########.fr       */
+/*   Updated: 2022/07/06 13:08:04 by dsamain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "tree.hpp"
+
 
 namespace ft {
 
@@ -60,24 +61,28 @@ namespace ft {
 		typedef tree<value_type, value_compare, allocator_type> tree_type;
 	public:
 
+	/*------------------PRINT------------------*/
+	void print() {
+		_tree.print();
+	}
 
 	/*------------------Constructor------------------*/
 
 		explicit map(const key_compare &comp = key_compare(),
               const allocator_type &alloc = allocator_type())
-		: _alloc(alloc), _keyComp(comp), _comp(comp), tree(value_compare(comp)) {
+		: _alloc(alloc), _keyComp(comp), _comp(comp), _tree(value_compare(comp)) {
 		}		
 
 		template <class InputIterator>
   		map (InputIterator first, InputIterator last,
        const key_compare& comp = key_compare(),
        const allocator_type& alloc = allocator_type())
-	   : _alloc(alloc), _keyComp(comp), _comp(comp), tree(value_compare(comp)) {
+	   : _alloc(alloc), _keyComp(comp), _comp(comp), _tree(value_compare(comp)) {
 			insert(first, last);
 	   }
 
 		map(const map &cpy)
-		: _alloc(cpy._alloc), _keyComp(cpy._keyComp), _comp(cpy._comp), tree(value_compare(cpy._comp)) {
+		: _alloc(cpy._alloc), _keyComp(cpy._keyComp), _comp(cpy._comp), _tree(value_compare(cpy._comp)) {
 			this->insert(cpy.begin(), cpy.end());
 		}
 
@@ -94,11 +99,11 @@ namespace ft {
 
 	/*------------------Iterator------------------*/
 
-		iterator end() {return tree.end();}
-		const_iterator end() const {return tree.end();}
+		iterator end() {return _tree.end();}
+		const_iterator end() const {return _tree.end();}
 
-		iterator begin() {return tree.begin();}
-		const_iterator begin() const {return tree.begin();}
+		iterator begin() {return _tree.begin();}
+		const_iterator begin() const {return _tree.begin();}
 		
 		reverse_iterator rbegin() {return reverse_iterator(end());}
 		const_reverse_iterator rbegin() const {return const_reverse_iterator(end());}
@@ -108,11 +113,11 @@ namespace ft {
 
 	/*------------------Capacity------------------*/
 
-		bool empty() const {return tree.empty();}
+		bool empty() const {return _tree.empty();}
 
-		size_type size() const {return tree.size();}
+		size_type size() const {return _tree.size();}
 
-		size_type max_size() const {return tree.max_size();}
+		size_type max_size() const {return _tree.max_size();}
 
 
 	/*------------------Element Acces------------------*/
@@ -124,7 +129,7 @@ namespace ft {
 	/*------------------Modifiers------------------*/
 
 		ft::pair<iterator, bool> insert(const value_type &val) {
-			return tree.insert(val);
+			return _tree.insert(val);
 		}
 
 		iterator insert (iterator position, const value_type& val) {
@@ -139,19 +144,19 @@ namespace ft {
 		void erase (iterator position) {erase(position->first);}
 
 		size_type erase( const Key& key ) {
-			return tree.erase(ft::make_pair(key, mapped_type()));
+			return _tree.erase(ft::make_pair(key, mapped_type()));
 		}
 
 		void erase (iterator first, iterator last) {while (first != last) erase(first++);}
 
 		void swap (map &x) {
-			tree.swap(x.tree);
+			_tree.swap(x._tree);
 		}
 
 		friend void swap (map &x, map &y) {x.swap(y);}
 
 		void clear() {
-			tree.clear();
+			_tree.clear();
 		}
 
 
@@ -164,28 +169,28 @@ namespace ft {
 	/*------------------Finder------------------*/
 
 	iterator find (const key_type& k) {
-		return tree.find(ft::make_pair(k, mapped_type()));
+		return _tree.find(ft::make_pair(k, mapped_type()));
 	}
 
 	const_iterator find (const key_type& k) const {
-		return tree.find(ft::make_pair(k, mapped_type()));
+		return _tree.find(ft::make_pair(k, mapped_type()));
 	}
 
 	size_type count (const key_type& k) const {return (find(k) != end());}
 
 	iterator lower_bound (const key_type& k) {
-		return tree.lower_bound(ft::make_pair(k, mapped_type()));
+		return _tree.lower_bound(ft::make_pair(k, mapped_type()));
 	}
 
 	const_iterator lower_bound (const key_type& k) const {
-		return tree.lower_bound(ft::make_pair(k, mapped_type()));
+		return _tree.lower_bound(ft::make_pair(k, mapped_type()));
 	}
 
 	iterator upper_bound (const key_type& k) {
-		return tree.upper_bound(ft::make_pair(k, mapped_type()));
+		return _tree.upper_bound(ft::make_pair(k, mapped_type()));
 	}
 	const_iterator upper_bound (const key_type& k) const {
-		return tree.upper_bound(ft::make_pair(k, mapped_type()));
+		return _tree.upper_bound(ft::make_pair(k, mapped_type()));
 	}
 
 	pair<iterator,iterator>             equal_range (const key_type& k) {return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));}
@@ -216,8 +221,8 @@ namespace ft {
 		Alloc _alloc;
 		key_compare _keyComp;
 		value_compare _comp;
-
-		tree_type tree;
+	public:
+		tree_type _tree;
 
 
 		// Private function

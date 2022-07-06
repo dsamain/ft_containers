@@ -39,5 +39,4 @@ template<bool B, class T = void>
 
 template<class T>
 	struct enable_if<true, T> {typedef T type;};
-
 }

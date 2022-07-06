@@ -9,16 +9,12 @@
 
 namespace ft {
 
+	typedef long long ll;
 
     template<typename T, typename Alloc = std::allocator<T> >
     class vector {
     public:
 
-	/*------------------Conversion------------------*/
-	/*------------------Comparaison------------------*/
-	/*------------------Increment------------------*/
-	/*------------------Access------------------*/
-	/*------------------Constructor------------------*/
 	/*------------------Member type------------------*/
         /*      ALIAS       */
 
@@ -32,15 +28,14 @@ namespace ft {
         typedef typename Alloc::pointer pointer;
         typedef typename Alloc::const_pointer const_pointer;
 
-
         typedef typename ft::vector_iterator<T> iterator;
         typedef typename ft::vector_iterator<const T> const_iterator;
         typedef typename ft::rev_iterator<iterator> reverse_iterator;
         typedef typename ft::rev_iterator<const_iterator> const_reverse_iterator;
 
-        
-
         		/*      *structor     */
+
+	/*------------------Constructor------------------*/
         explicit vector (const allocator_type& alloc = allocator_type()) // Default
         : _alloc(alloc), _capacity(0), _size(0) {_arr = _alloc.allocate(0);}
 
@@ -84,6 +79,11 @@ namespace ft {
 			}
 		}
 				/*		Member operator		*/
+
+	/*------------------Conversion------------------*/
+	/*------------------Comparaison------------------*/
+	/*------------------Increment------------------*/
+	/*------------------Access------------------*/
 		vector &operator=(const vector &x) {
 			clear();
 			_alloc.deallocate(_arr, _capacity);
@@ -287,9 +287,9 @@ namespace ft {
 
 		const_reverse_iterator rbegin() const {return const_reverse_iterator(const_iterator(_arr + _size));}
 
-		reverse_iterator rend() {return reverse_iterator(_arr - 1);}
+		reverse_iterator rend() {return reverse_iterator(_arr);}
 
-		const_reverse_iterator rend() const {return const_reverse_iterator(_arr - 1);}
+		const_reverse_iterator rend() const {return const_reverse_iterator(_arr);}
 
 				/*		Non member overload		*/
   		friend bool operator==(const vector& lhs, const vector& rhs) {
