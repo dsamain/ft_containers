@@ -1,0 +1,31 @@
+In file included from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\bits\postypes.h:40:0,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\iosfwd:40,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\ios:38,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\ostream:38,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\iostream:39,
+                 from stack_tester.cpp:1:
+c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\cwchar:164:11: error: '::vfwscanf' has not been declared
+   using ::vfwscanf;
+           ^~~~~~~~
+c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\cwchar:170:11: error: '::vswscanf' has not been declared
+   using ::vswscanf;
+           ^~~~~~~~
+c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\cwchar:174:11: error: '::vwscanf' has not been declared
+   using ::vwscanf;
+           ^~~~~~~
+c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\cwchar:191:11: error: '::wcstof' has not been declared
+   using ::wcstof;
+           ^~~~~~
+In file included from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\bits\locale_facets.h:39:0,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\bits\basic_ios.h:37,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\ios:44,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\ostream:38,
+                 from c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\iostream:39,
+                 from stack_tester.cpp:1:
+c:\mingw\lib\gcc\mingw32\6.3.0\include\c++\cwctype:89:11: error: '::iswblank' has not been declared
+   using ::iswblank;
+           ^~~~~~~~
+rm: cannot remove 'ft.out': No such file or directory
+rm: cannot remove 'std.out': No such file or directory
+rm: cannot remove 'ft': No such file or directory
+rm: cannot remove 'std': No such file or directory

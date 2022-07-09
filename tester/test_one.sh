@@ -17,5 +17,5 @@ else
 
 fi
 
-rm ft.out std.out ft std 2> log
-rm log
+rm ft.out std.out ft std 2>> log
+#rm log
