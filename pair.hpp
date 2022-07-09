@@ -34,9 +34,16 @@ namespace ft {
 
 		T1 first;
 		T2 second;
+
+
+		#ifdef DEBUG
+			friend std::ostream &operator<<(std::ostream &os, const pair &pr) {
+				os << "(" << pr.first << ", " << pr.second << ")";
+				return os;
+			}
+		#endif
 	};
 
-	// Non member overload
 	template<typename T1, typename T2>
 	bool operator==(const pair<T1,T2> &lhs, const pair<T1,T2> &rhs) {
 		return (lhs.first == rhs.first && lhs.second == rhs.second);
@@ -81,6 +88,9 @@ namespace ft {
 		std::swap(x.second, y.second);
 	}
 
-	// GET 
+	template<typename T1, typename T2>
+	ft::pair<T1, T2> make_pair(T1 x, T2 y) {
+		return ft::pair<T1, T2>(x, y);
+	}
 
 }

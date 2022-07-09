@@ -8,6 +8,7 @@ int		main(void)
 {
 	TESTED_NAMESPACE::stack<TESTED_TYPE> stck;
 
+	container_type v;	
 	std::cout << "empty: " << stck.empty() << std::endl;
 	std::cout << "size: " << stck.size() << std::endl;
 

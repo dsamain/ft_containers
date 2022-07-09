@@ -68,26 +68,6 @@ template<typename T, typename Alloc = std::allocator<T> >
 		typedef rev_iterator<const_iterator> const_reverse_iterator;	
 
 
-	/*------------------PRINT------------------*/
-
-		//only for map
-		void print() {
-			printBT("", _root);
-		}
-
-		void printBT(const std::string &prefix, nodePtr node, bool isLeft = 0)
-		{
-			if (!node) return;
-
-			std::cout << prefix;
-        	std::cout << (isLeft ? "├──" : "└──" );
-
-        	std::cout << node->val->first <<  (node->col == BLACK ? "(B)" : "(R)") << std::endl;
-
-        	printBT(prefix + (isLeft ? "│   " : "    "), node->left, true);
-        	printBT(prefix + (isLeft ? "│   " : "    "), node->right, false);
-		}
-
 
 	/*------------------Constructor------------------*/
 
@@ -171,10 +151,40 @@ template<typename T, typename Alloc = std::allocator<T> >
 			return ret;
 		}
 
-		void deleteNode(nodePtr nd) {
-			_nodeAlloc.destroy(nd);
-			_nodeAlloc.deallocate(nd, 1);
+		void deleteNode(nodePtr node) {
+			_nodeAlloc.destroy(node);
+			_nodeAlloc.deallocate(node, 1);
 		}
+
+		nodePtr successor(nodePtr node) {
+			if (!node || !node->right)
+				return (NULL);
+			node = node->right;
+			while (node->left)
+				node = node->left;
+			return node;
+		}
+
+		nodePtr predecessor(nodePtr node) {
+			if (!node || !node->left)
+				return (NULL);
+			node = node->left;
+			while (node->right)
+				node = node->right;
+			return node;
+		}
+
+		void transplant(nodePtr u, nodePtr v) {
+			if (!u->par)
+				_root = v;
+			else if (u == u->par->left)
+				u->par->left = v;
+			else
+				u->par->right = v;
+			if (v)
+				v->par = u->par;
+		}
+
 
 		nodePtr insert_child(nodePtr parent, nodePtr node) {
 			if (!parent) {
@@ -253,20 +263,20 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 	/*------------------Insertion------------------*/
 
-		ft::pair<iterator, bool> insert(const value_type &val) {
+		ft::pair<nodePtr, bool> insert(const value_type &val) {
 			nodePtr cur = _root, parent = NULL, node;
 
 			while (cur && cur != &_last) {
 				parent = cur;
 				if (_comp(val, *cur->val)) cur = cur->left;
 				else if (_comp(*cur->val, val)) cur = cur->right;
-				else return ft::make_pair(iterator(cur, &_last), false);
+				else return ft::make_pair(cur, false);
 			}
 			node = insert_child(parent, newNode(val));
 
 			InsertFix(node);
 
-			return ft::make_pair(iterator(node, &_last), true);
+			return ft::make_pair(node, true);
 		}
 
 		// Red-Black tree insertFix
@@ -318,55 +328,139 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 
 	/*------------------Erase------------------*/
+					
 
 		size_type erase( const value_type &val) {
-			nodePtr cur = _root;
+			nodePtr node = _root;
 
-			while (cur && !isEqual(*cur->val, val) && cur != &_last)
-				cur = (_comp(val, *cur->val) ? cur->left : cur->right);
+			while (node && !isEqual(*node->val, val))
+				node = (_comp(val, *node->val) ? node->left : node->right);
 
-			if (!cur || cur == &_last) return 0;
+			if (!node || node == &_last)
+				return 0;
 
-			if (cur->left && (cur->right && cur->right != &_last)) { // if node have two children, find successor and swap (should not affect nodes color)
-				nodePtr successor = cur->right;
-				while (successor->left)
-					successor = successor->left;
-				ft::swap(successor->val, cur->val);
-				cur = successor;
+			nodePtr x, y, dummy = NULL;
+			bool original_col = node->col;
+
+			if (!node->left && !node->right) {
+				dummy = newNode(val);
+				dummy->col = BLACK;
+				transplant(node, dummy);
+				x = dummy;
 			}
-			eraseNode(cur);
+			else if (!node->left) {
+				transplant(node, node->right);
+				x = node->right;
+			} else if (!node->right || node->right == &_last) {
+				transplant(node, node->left);
+				if (node->right == &_last) {
+
+					nodePtr tmp = node->left;
+					while (tmp->right)
+						tmp = tmp->right;
+					tmp->right = &_last;
+					_last.par = tmp;
+				}
+				x = node->left;
+
+			} else {
+				y = predecessor(node);
+				x = y->left;
+				if (!x) {
+					dummy = newNode(val);
+					dummy->col = BLACK;
+					dummy->par = y;
+					y->left = dummy;
+					x = dummy;
+				}
+				original_col = y->col;
+				if (y->par != node) {
+					transplant(y, x);
+					y->left = node->left;
+					if (y->left)
+						y->left->par = y;
+				}
+				transplant(node, y);
+				y->col = node->col;
+				y->right = node->right;
+				if (y->right)
+					y->right->par = y;
+			}
+
+			if (x && original_col == BLACK)
+				deleteFix(x);
+
+			if (dummy) {
+				transplant(dummy, NULL);
+				deleteNode(dummy);
+			}
+
+			deleteNode(node);
+
+			_size--;
+
 			return 1;
 		}
 
-		void eraseNode(nodePtr nd) {
-			nodePtr newChild = NULL;
-
-			if (nd->left)
-				newChild = nd->left;
-			else if (nd->right && nd->right != &_last)
-				newChild = nd->right;
-
-			if (nd->par) {
-				if (nd->par->left == nd)
-					nd->par->left = newChild;
-				else
-					nd->par->right = newChild;
+		void deleteFix(nodePtr node) {
+			while (node != _root && node->col == BLACK) {
+				if (node == node->par->left) {
+					nodePtr s = node->par->right;
+					if (s && s->col == RED) {
+						s->col = BLACK;
+						node->par->col = RED;
+						leftRotate(node->par);
+						s = node->par->right;
+					}
+					if (s && (!s->left || s->left->col == BLACK) && (!s->right || s->right->col == BLACK)) {
+						s->col = RED;
+						node = node->par;
+					} else {
+						if (s && (!s->right || s->right->col == BLACK)) {
+							if (s->left)
+								s->left->col = BLACK;
+							s->col = RED;
+							rightRotate(s);
+							s = node->par->right;
+						}
+						if (s) {
+							s->col = node->par->col;
+							s->right->col = BLACK;
+						}
+							node->par->col = BLACK;
+							leftRotate(node->par);
+							node = _root;
+					}
+				} else {
+					nodePtr s = node->par->left;
+					if (s && s->col == RED) {
+						s->col = BLACK;
+						node->par->col = RED;
+						rightRotate(node->par);
+						s = node->par->left;
+					}
+					if (s && (!s->right || s->right->col == BLACK) && (!s->left || s->left->col == BLACK)) {
+						s->col = RED;
+						node = node->par;
+					} else {
+						if (s && (!s->left || s->left->col == BLACK)) {
+							if (s->right)
+								s->right->col = BLACK;
+							s->col = RED;
+							leftRotate(s);
+							s = node->par->left;
+						}
+						if (s) {
+							s->col = node->par->col;
+							s->left->col = BLACK;
+						}
+							node->par->col = BLACK;
+							rightRotate(node->par);
+							node = _root;
+					}
+				}
 			}
-
-			if (newChild) newChild->par = nd->par;
-
-			if (_root == nd)  _root = (newChild ? newChild : &_last);
-
-			if (_last.par == nd) {
-				nodePtr p = _root;
-				while (p->right && p->right != &_last)
-					p = p->right;
-				_last.par = p;
-				p->right = &_last;
-			}
-
-			deleteNode(nd);
-			_size--;
+			node->col = 0;
 		}
 
 		void swap (tree &x) {
@@ -443,7 +537,59 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 	/*------------------Guetter------------------*/
 
-	nodePtr lastNode() {return &_last;};
+	nodePtr getlast() {return &_last;};
+	nodePtr getRoot() {return _root;};
+
+
+	/*------------------DEBUG------------------*/
+
+		void print(const std::string &prefix, nodePtr node, bool isLeft = 0)
+		{
+			if (!node) return;
+
+			std::cout << prefix;
+        	std::cout << (isLeft ? "├──" : "└──" );
+
+        	std::cout << node->val->first <<  (node->col == BLACK ? "(B)" : "(R)") << std::endl;
+
+        	print(prefix + (isLeft ? "│   " : "    "), node->left, true);
+        	print(prefix + (isLeft ? "│   " : "    "), node->right, false);
+		}
+
+		void checkValid() {
+
+			int minDepth = 2147483647, maxDepth = 0;
+			checkValidDfs(_root, 0, minDepth, maxDepth);
+
+			if (maxDepth != minDepth) {
+				std::cout << "BLACK depth rule violoated" << std::endl;
+				std::cout << "minDepth: " << minDepth << std::endl;
+				std::cout << "maxDepth: " << maxDepth << std::endl;
+				std::cout << "tree : " << std::endl;
+				print("", _root, 0);
+
+			}
+		}
+
+		void checkValidDfs(nodePtr node, int depth, int &minDepth, int &maxDepth) {
+			depth += (!node || node->col == BLACK);
+			if (!node || node == &_last) {
+				minDepth = ft::min(minDepth, depth);
+				maxDepth = ft::max(maxDepth, depth);
+				return;
+			}
+
+			if (node->col == RED) {
+				if ((node->left && node->left->col== RED)
+					|| (node->right && node->right->col== RED)) {
+					std::cout << "RED rule violated" << std::endl;
+				}
+			}
+
+			checkValidDfs(node->left, depth , minDepth, maxDepth);
+			checkValidDfs(node->right, depth , minDepth, maxDepth);
+		}
+
 
 	private:
 		size_type _size;

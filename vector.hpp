@@ -1,11 +1,11 @@
 #pragma once
 
+#include <exception>
 #include "type_traits.hpp"
 #include "algorithm.hpp"
 #include "template_utils.hpp"
 #include "./iterator/vector_iterator.hpp"
 #include "./iterator/reverse_iterator.hpp"
-#include <exception>
 
 namespace ft {
 
@@ -16,7 +16,6 @@ namespace ft {
     public:
 
 	/*------------------Member type------------------*/
-        /*      ALIAS       */
 
         typedef T value_type;
         typedef Alloc allocator_type;
@@ -33,9 +32,9 @@ namespace ft {
         typedef typename ft::rev_iterator<iterator> reverse_iterator;
         typedef typename ft::rev_iterator<const_iterator> const_reverse_iterator;
 
-        		/*      *structor     */
 
 	/*------------------Constructor------------------*/
+
         explicit vector (const allocator_type& alloc = allocator_type()) // Default
         : _alloc(alloc), _capacity(0), _size(0) {_arr = _alloc.allocate(0);}
 
@@ -64,7 +63,7 @@ namespace ft {
 				_alloc.construct(_arr + i, *first++);
 		}
 
-		vector(const vector &x) // Copy
+		vector(const vector &x)
 		: _alloc(x._alloc), _capacity(x._capacity), _size(x._size) { 
         	_arr = _alloc.allocate(_capacity);
         	for (int i = 0; i < (int)_size; i++)
@@ -78,12 +77,7 @@ namespace ft {
 				_alloc.deallocate(_arr, _capacity);
 			}
 		}
-				/*		Member operator		*/
 
-	/*------------------Conversion------------------*/
-	/*------------------Comparaison------------------*/
-	/*------------------Increment------------------*/
-	/*------------------Access------------------*/
 		vector &operator=(const vector &x) {
 			clear();
 			_alloc.deallocate(_arr, _capacity);
@@ -91,12 +85,14 @@ namespace ft {
 			_capacity = x._capacity;
 			_size = x._size;
 			_arr = _alloc.allocate(_capacity);
-			for (int i = 0; i < (int)_size; i++) {
+			for (int i = 0; i < (int)_size; i++)
 				_alloc.construct(_arr + i, *(x._arr + i));
-			}
 			return *this;
 		}
-				/*		Capacity		*/
+
+
+	/*------------------Capacity------------------*/
+
 		size_type size() const {return _size;}
 	
 		void resize (size_type n, value_type val = value_type()) {
@@ -135,7 +131,9 @@ namespace ft {
 			_capacity = n;
 		}
 
-        		/*      Element access		*/
+
+	/*------------------Access------------------*/
+        		
         reference operator[] (size_type n) {return _arr[n];}
 
         const_reference operator[] (size_type n) const {return _arr[n];}
@@ -158,7 +156,9 @@ namespace ft {
 
 		const_reference back() const {return _arr[_size-1];}
 
-        		/*      Modifiers		*/
+
+	/*------------------Modifiers------------------*/
+        		
 		template <class InputIterator>
   		void assign (InputIterator first, InputIterator last,
 		typename ft::enable_if<!ft::is_integral<InputIterator>::value, bool>::type tmp = 0) { // if is_integer<InputIt>::val == 0 , if_is::exist will not exist :)
@@ -184,7 +184,7 @@ namespace ft {
 					if (_size)
 						_alloc.deallocate(_tmp, _size);
 				}
-				_arr[_size++] = val;
+				_alloc.construct(_arr + _size++, val);
 		}
 
 		void pop_back() {
@@ -203,34 +203,34 @@ namespace ft {
     	void insert (iterator position, size_type n, const value_type& val) {
 			if (_size + n > _capacity) {
 				iterator it = begin();
-				int sz = ft::max(_capacity * 2, _size + n), i=0;
+				int sz = ft::max(_capacity * 2, _size + n), i = 0;
 				pointer tmp = _alloc.allocate(sz);
 
 				for (; it != position; ++i, ++it) {
-					_alloc.construct(tmp+i, *(_arr + i));
+					_alloc.construct(tmp + i, *(_arr + i));
 					_alloc.destroy(_arr + i);
 				}
-				for (size_type _=0; _ < n; ++_, ++i)
-					_alloc.construct(tmp+i, val);
+				for (size_type _ = 0; _ < n; ++_, ++i)
+					_alloc.construct(tmp + i, val);
 				while (position != end()) {
-					_alloc.construct(tmp + i++, *position++);
-					_alloc.destroy(_arr + i);
+					_alloc.construct(tmp + i, *position++);
+					_alloc.destroy(_arr + i++);
 				}
 				_alloc.deallocate(_arr, _capacity);
 				_arr = tmp;
 				_capacity = sz;
 				_size += n;
 			} else {
-				iterator it = end()-1;
-				int i = _size-1;
+				iterator it = end() - 1;
+				int i = _size - 1;
 
-				for (; it >= position; i--, --it) {
-					_alloc.construct(_arr+i+n, *(_arr+i));
-					_alloc.destroy(_arr+i);
+				for (; it >= position; --i, --it) {
+					_alloc.construct(_arr + i + n, *(_arr + i));
+					_alloc.destroy(_arr + i);
 				}
 				for (int j = i + n; j > i; j--) {
-					_alloc.destroy(_arr+j);
-					_alloc.construct(_arr+j, val);
+					_alloc.destroy(_arr + j);
+					_alloc.construct(_arr + j, val);
 				}
 				_size += n;
 			}
@@ -245,7 +245,7 @@ namespace ft {
 				insert(iterator(begin()+gap++), *first), ++first;
   		}
 
-		iterator erase (iterator first, iterator last) { // undefined when last < first;
+		iterator erase (iterator first, iterator last) {
 			int gap = last - first;
 			int beg = first - iterator(_arr);
 
@@ -261,7 +261,7 @@ namespace ft {
 
 		iterator erase (iterator position) {return erase(position, position + 1);}
 
-		void swap (vector& x) {\
+		void swap (vector& x) {
 			ft::swap(_arr, x._arr);
 			ft::swap(_alloc, x._alloc);
 			ft::swap(_capacity, x._capacity);
@@ -274,7 +274,9 @@ namespace ft {
 			_size = 0;	
 		}
 
-        		/*      Iterator        */
+
+	/*------------------Iterator------------------*/
+        		
 		iterator begin() {return iterator(_arr);}
 
 		const_iterator begin() const {return const_iterator(_arr);}
@@ -291,11 +293,15 @@ namespace ft {
 
 		const_reverse_iterator rend() const {return const_reverse_iterator(_arr);}
 
-				/*		Non member overload		*/
+
+	/*------------------Comparaison------------------*/
+
   		friend bool operator==(const vector& lhs, const vector& rhs) {
-			if (lhs.size() != rhs.size()) return 0;
+			if (lhs.size() != rhs.size())
+				return 0;
 			for (size_type i = 0; i < lhs.size(); i++)
-				if (lhs[i] != rhs[i]) return 0;
+				if (lhs[i] != rhs[i])
+					return 0;
 			return 1;
 		} 
 
@@ -318,6 +324,8 @@ namespace ft {
   		friend bool operator>=(const vector& lhs, const vector& rhs) {
 			return (lhs == rhs || lhs > rhs);
 		}
+
+  		friend void swap(vector<T, Alloc> &x, vector<T, Alloc> &y) {x.swap(y);}
 		
     private:
         pointer _arr;
@@ -326,7 +334,5 @@ namespace ft {
         size_type _size;
     };
 
-	template<typename T, typename Alloc>
-  	void swap(vector<T, Alloc> &x, vector<T, Alloc> &y) {x.swap(y);}
 
 }

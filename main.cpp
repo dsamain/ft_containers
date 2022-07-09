@@ -3,21 +3,24 @@
 #include <vector>
 #include <map>
 #include "map.hpp"
+#include "tree.hpp"
 #include "type_traits.hpp"
 #include "algorithm.hpp"
 #include "vector.hpp"
 #include "template_utils.hpp"
 #include <random>
 #include <time.h>
-//#include "node.hpp"
 #include "pair.hpp"
+#include <set>
+#include "set.hpp"
+#include "iterator_traits.hpp"
 
 template<typename T>
 class Foo {
 
 };
 
-#define N 20
+#define N 1000000
 
 #ifdef STD
  #define ns std
@@ -56,14 +59,44 @@ void put_eq(ns::vector<value>::reverse_iterator rit1, ns::vector<value>::reverse
 
 int main() {
 	
-	ns::vector<key> v = permutation(N);
-	ns::map<key,value> mp;
-	
-	//std::sort(v.begin(), v.end(), std::greater<key>());
-	//std::sort(v.begin(), v.end());
-	for (int i = 0; i < v.size(); i++) {
-		mp[v[i]] = 0;
-	}
+	std::vector<int> v;
+	std::cout << "v.capacity(): " << v.capacity() << std::endl;
 
-	mp._tree.print();
+	ft::set<int> st;
+
+	ft::set<int>::const_iterator cit = st.begin();
+	ft::set<int>::iterator it(cit);
+	//ft::set<int,int>::const_iterator cit = st.begin();
+
+	//cit = it;
+
+//return 0;
+	//ft::map<int,int> m;
+	//ft::map<int,int>::iterator it = m.begin();
+	//ft::map<int,int>::const_iterator cit(it);
+
+	//ns::vector<key> v = permutation(N);
+	//ns::map<key,value> mp;
+	//srand(time(NULL));
+	
+	////std::sort(v.begin(), v.end(), std::greater<key>());
+	//std::sort(v.begin(), v.end());
+	//for (int i = 0; i < v.size(); i++) {
+		//mp[v[i]] = 0;
+	//}
+	
+
+	//v = permutation(N);
+
+	//for (int i = 0; i < N; i++) {
+		////std::cout << "erase " << v[i] << std::endl;
+		////mp.print();	
+		//if (rand()%10000 == 0)
+			//mp.checkValid();
+
+		//mp.erase(v[i]);
+
+	//}
+	//mp.print();
+
 } 

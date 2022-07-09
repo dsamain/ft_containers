@@ -94,9 +94,8 @@ namespace ft {
 
 	/*------------------Conversion------------------*/
 
-		operator bidirectional_iterator<T, Compare, Alloc, Node, 1> () {
-			bidirectional_iterator<T, Compare, Alloc, Node, 1> ret(_ptr, _last);
-			return ret;
+		operator bidirectional_iterator<T, Compare, Alloc, Node, true> () {
+			return bidirectional_iterator<T, Compare, Alloc, Node, true> (_ptr, _last);
 		}
 
 	private:
