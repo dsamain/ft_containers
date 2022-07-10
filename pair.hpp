@@ -35,7 +35,6 @@ namespace ft {
 		T1 first;
 		T2 second;
 
-
 		#ifdef DEBUG
 			friend std::ostream &operator<<(std::ostream &os, const pair &pr) {
 				os << "(" << pr.first << ", " << pr.second << ")";

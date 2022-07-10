@@ -41,7 +41,7 @@ namespace ft {
 		
 	/*------------------Access------------------*/
 
-		reference operator*() const {return *_ptr->val;}
+		reference operator*() const {return  _ptr->val;}
 		pointer operator->() const {return &(**this);}
 
 
@@ -52,8 +52,8 @@ namespace ft {
 				_ptr = _ptr->right;
 				while (_ptr->left) _ptr = _ptr->left;
 			} else {
-				value_type cur_val = *_ptr->val;	
-				while (!_comp(cur_val, *_ptr->val))
+				value_type cur_val = _ptr->val;	
+				while (!_comp(cur_val, _ptr->val))
 					_ptr = _ptr->par;
 			}
 			return *this;
@@ -72,8 +72,8 @@ namespace ft {
 				_ptr = _ptr->left;
 				while (_ptr->right) _ptr = _ptr->right;
 			} else {
-				value_type cur_val = *_ptr->val;	
-				while (!_comp(*_ptr->val, cur_val))
+				value_type cur_val =  _ptr->val;	
+				while (!_comp( _ptr->val, cur_val))
 					_ptr = _ptr->par;
 			}
 			return *this;

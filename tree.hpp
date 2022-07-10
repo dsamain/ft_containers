@@ -19,29 +19,13 @@ namespace ft {
 
 template<typename T, typename Alloc = std::allocator<T> >
 	struct node {
-		Alloc	alloc;
 		node	*par;
 		node	*left;
 		node	*right;
-		T		*val;
+		T		val;
 		bool	col;
 
-		// Default constructor (value can be precised)
-		node(T fval = T()) : alloc(Alloc()), par(NULL), left(NULL), right(NULL), col(RED) {
-			val = alloc.allocate(1);
-			alloc.construct(val, fval);
-		}
-
-		// Color and value constructor
-		node(bool fcol, T fval) : alloc(Alloc()), par(NULL), left(NULL), right(NULL), col(fcol) {
-			val = alloc.allocate(1);
-			alloc.construct(val, fval);
-		}
-
-		~node() {
-			alloc.destroy(val);
-			alloc.deallocate(val, 1);
-		}
+		node(T v = T(), bool c = RED) : par(NULL), left(NULL), right(NULL), val(v), col(c) {}
 	};
 
 	template<typename T, typename Compare, typename Alloc>
@@ -72,7 +56,7 @@ template<typename T, typename Alloc = std::allocator<T> >
 	/*------------------Constructor------------------*/
 
 		explicit tree(const value_compare &comp) 
-		: _size(0), _alloc(allocator_type()), _nodeAlloc(std::allocator<node<value_type> >()), _last(BLACK, value_type()), _comp(comp) {
+		: _size(0), _alloc(allocator_type()), _nodeAlloc(std::allocator<node<value_type> >()), _last(value_type(), BLACK), _comp(comp) {
 			_root = &_last;
 		}		
 
@@ -128,17 +112,9 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 		size_type size() const {return _size;}
 
-		typedef struct				s_node
-		{
-			T						data;
-			bool					color;
-			struct s_node *			left;
-			struct s_node *			right;
-			struct s_node *			parent;
-		} tmp_node;
-
 		size_type max_size() const {
-			typename Alloc::template rebind<tmp_node>::other tmp;
+
+			typename Alloc::template rebind<node_type>::other tmp;
 			return tmp.max_size();
 		}	
 
@@ -193,7 +169,7 @@ template<typename T, typename Alloc = std::allocator<T> >
 				_root->right = &_last;
 				node->col = BLACK;
 			} else {
-				if (_comp(*parent->val, *node->val)) {
+				if (_comp(parent->val, node->val)) {
 					if (parent->right == &_last) {
 						_last.par = node;
 						node->right = &_last;
@@ -209,57 +185,57 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 	/*------------------Rotation------------------*/
 
-	nodePtr	leftRotate(nodePtr node) {
-		if (!node || !node->right)
-			return NULL;
-		nodePtr	y = node->right;
-		node->right = y->left;
-		if (y->left)
-			y->left->par = node;
-		if (node == _root)
-			_root = y;
-		else if (node == node->par->left)
-			node->par->left = y;
-		else
-			node->par->right = y;
-		y->par = node->par;
-		node->par = y;
-		y->left = node;
-		return y;
-	}
+		nodePtr	leftRotate(nodePtr node) {
+			if (!node || !node->right)
+				return NULL;
+			nodePtr	y = node->right;
+			node->right = y->left;
+			if (y->left)
+				y->left->par = node;
+			if (node == _root)
+				_root = y;
+			else if (node == node->par->left)
+				node->par->left = y;
+			else
+				node->par->right = y;
+			y->par = node->par;
+			node->par = y;
+			y->left = node;
+			return y;
+		}
 
-	nodePtr	rightRotate(nodePtr node) {
-		if (!node || !node->left)
-			return NULL;
-		nodePtr	y = node->left;
-		node->left = y->right;
-		if (y->right)
-			y->right->par = node;
-		if (node == _root)
-			_root = y;
-		else if (node == node->par->left)
-			node->par->left = y;
-		else
-			node->par->right = y;
-		y->par = node->par;
-		node->par = y;
-		y->right = node;
-		return y;
-	}
+		nodePtr	rightRotate(nodePtr node) {
+			if (!node || !node->left)
+				return NULL;
+			nodePtr	y = node->left;
+			node->left = y->right;
+			if (y->right)
+				y->right->par = node;
+			if (node == _root)
+				_root = y;
+			else if (node == node->par->left)
+				node->par->left = y;
+			else
+				node->par->right = y;
+			y->par = node->par;
+			node->par = y;
+			y->right = node;
+			return y;
+		}
 
-	nodePtr leftRightRotate(nodePtr node) {
-		if (!node || !node->left || !node->left->right)
-			return NULL;
-		leftRotate(node->left);
-		return rightRotate(node);
-	}
+		nodePtr leftRightRotate(nodePtr node) {
+			if (!node || !node->left || !node->left->right)
+				return NULL;
+			leftRotate(node->left);
+			return rightRotate(node);
+		}
 
-	nodePtr rightLeftRotate(nodePtr node) {
-		if (!node || !node->right || !node->right->left)
-			return NULL;
-		rightRotate(node->right);
-		return leftRoate(node);
-	}
+		nodePtr rightLeftRotate(nodePtr node) {
+			if (!node || !node->right || !node->right->left)
+				return NULL;
+			rightRotate(node->right);
+			return leftRoate(node);
+		}
 
 	/*------------------Insertion------------------*/
 
@@ -268,8 +244,8 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 			while (cur && cur != &_last) {
 				parent = cur;
-				if (_comp(val, *cur->val)) cur = cur->left;
-				else if (_comp(*cur->val, val)) cur = cur->right;
+				if (_comp(val, cur->val)) cur = cur->left;
+				else if (_comp(cur->val, val)) cur = cur->right;
 				else return ft::make_pair(cur, false);
 			}
 			node = insert_child(parent, newNode(val));
@@ -279,14 +255,12 @@ template<typename T, typename Alloc = std::allocator<T> >
 			return ft::make_pair(node, true);
 		}
 
-		// Red-Black tree insertFix
 		void insertFix(nodePtr node) {
 			if (!node->par || !node->par->par) 
 				return;
 			while (node->par && node->par->col == RED) {
 				nodePtr p = node->par, gp = node->par->par;
 				if (p == gp->left)
-			 		//Case 1
 					if (gp->right && gp->right->col == RED) {
 						gp->right->col = BLACK;
 						gp->left->col = BLACK;
@@ -329,12 +303,11 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 	/*------------------Erase------------------*/
 					
-
 		size_type erase( const value_type &val) {
 			nodePtr node = _root;
 
-			while (node && !isEqual(*node->val, val))
-				node = (_comp(val, *node->val) ? node->left : node->right);
+			while (node && !isEqual(node->val, val))
+				node = (_comp(val, node->val) ? node->left : node->right);
 
 			if (!node || node == &_last)
 				return 0;
@@ -347,14 +320,12 @@ template<typename T, typename Alloc = std::allocator<T> >
 				dummy->col = BLACK;
 				transplant(node, dummy);
 				x = dummy;
-			}
-			else if (!node->left) {
+			} else if (!node->left) {
 				transplant(node, node->right);
 				x = node->right;
 			} else if (!node->right || node->right == &_last) {
 				transplant(node, node->left);
 				if (node->right == &_last) {
-
 					nodePtr tmp = node->left;
 					while (tmp->right)
 						tmp = tmp->right;
@@ -362,7 +333,6 @@ template<typename T, typename Alloc = std::allocator<T> >
 					_last.par = tmp;
 				}
 				x = node->left;
-
 			} else {
 				y = predecessor(node);
 				x = y->left;
@@ -427,9 +397,9 @@ template<typename T, typename Alloc = std::allocator<T> >
 							s->col = node->par->col;
 							s->right->col = BLACK;
 						}
-							node->par->col = BLACK;
-							leftRotate(node->par);
-							node = _root;
+						node->par->col = BLACK;
+						leftRotate(node->par);
+						node = _root;
 					}
 				} else {
 					nodePtr s = node->par->left;
@@ -454,9 +424,9 @@ template<typename T, typename Alloc = std::allocator<T> >
 							s->col = node->par->col;
 							s->left->col = BLACK;
 						}
-							node->par->col = BLACK;
-							rightRotate(node->par);
-							node = _root;
+						node->par->col = BLACK;
+						rightRotate(node->par);
+						node = _root;
 					}
 				}
 			}
@@ -490,55 +460,55 @@ template<typename T, typename Alloc = std::allocator<T> >
 	
 	/*------------------Finder------------------*/
 
-	iterator find (const value_type& v) {
-		iterator ret = lower_bound(v);
-		return (ret == end() || !isEqual(*ret, v) ? end() : ret);
-	}
-
-	const_iterator find (const value_type& v) const {
-		const_iterator ret = lower_bound(v);
-		return (ret == end() || !isEqual(*ret, v) ? end() : ret);
-	}
-
-	iterator lower_bound (const value_type& v) {
-		nodePtr cur = _root, res = NULL;
-		while (cur && cur != &_last) {
-			if (_comp(*cur->val, v))
-				cur = cur->right;
-			else
-				res = cur, cur = cur->left;
+		iterator find (const value_type& v) {
+			iterator ret = lower_bound(v);
+			return (ret == end() || !isEqual(*ret, v) ? end() : ret);
 		}
-		return ((res && res != &_last) ? iterator(res, &_last) : end());
-	}
 
-	const_iterator lower_bound (const value_type& v) const {
-		nodePtr cur = _root, res = NULL;
-		while (cur && cur != &_last) {
-			if (_comp(*cur->val, v))
-				cur = cur->right;
-			else
-				res = cur, cur = cur->left;
+		const_iterator find (const value_type& v) const {
+			const_iterator ret = lower_bound(v);
+			return (ret == end() || !isEqual(*ret, v) ? end() : ret);
 		}
-		return ((res && res != &_last) ? const_iterator(res, &_last) : end());
-	}
 
-	iterator upper_bound (const value_type& v) {
-		iterator ret = lower_bound(v);
-		if (ret != end() && isEqual(*ret, v)) ++ret;
-		return ret;
-	}
+		iterator lower_bound (const value_type& v) {
+			nodePtr cur = _root, res = NULL;
+			while (cur && cur != &_last) {
+				if (_comp(cur->val, v))
+					cur = cur->right;
+				else
+					res = cur, cur = cur->left;
+			}
+			return ((res && res != &_last) ? iterator(res, &_last) : end());
+		}
 
-	const_iterator upper_bound (const value_type& v) const {
-		const_iterator ret = lower_bound(v);
-		if (ret != end() && isEqual(*ret, v)) ++ret;
-		return ret;
-	}
+		const_iterator lower_bound (const value_type& v) const {
+			nodePtr cur = _root, res = NULL;
+			while (cur && cur != &_last) {
+				if (_comp(cur->val, v))
+					cur = cur->right;
+				else
+					res = cur, cur = cur->left;
+			}
+			return ((res && res != &_last) ? const_iterator(res, &_last) : end());
+		}
+
+		iterator upper_bound (const value_type& v) {
+			iterator ret = lower_bound(v);
+			if (ret != end() && isEqual(*ret, v)) ++ret;
+			return ret;
+		}
+
+		const_iterator upper_bound (const value_type& v) const {
+			const_iterator ret = lower_bound(v);
+			if (ret != end() && isEqual(*ret, v)) ++ret;
+			return ret;
+		}
 
 
 	/*------------------Guetter------------------*/
 
-	nodePtr getLast() {return &_last;};
-	nodePtr getRoot() {return _root;};
+		nodePtr getLast() {return &_last;};
+		nodePtr getRoot() {return _root;};
 
 
 	/*------------------DEBUG------------------*/
@@ -550,7 +520,7 @@ template<typename T, typename Alloc = std::allocator<T> >
 			std::cout << prefix;
         	std::cout << (isLeft ? "├──" : "└──" );
 
-			std::cout << (node->col == BLACK ? "\033[1;90m" : "\033[1;31m") << *node->val << "\033[0m" << std::endl;
+			std::cout << (node->col == BLACK ? "\033[1;90m" : "\033[1;31m") << node->val << "\033[0m" << std::endl;
 
         	print(prefix + (isLeft ? "│   " : "    "), node->left, true);
         	print(prefix + (isLeft ? "│   " : "    "), node->right, false);

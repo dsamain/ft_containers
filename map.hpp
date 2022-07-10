@@ -6,7 +6,7 @@
 /*   By: dsamain <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 11:36:16 by dsamain           #+#    #+#             */
-/*   Updated: 2022/07/10 07:23:25 by dsamain          ###   ########.fr       */
+/*   Updated: 2022/07/10 08:29:38 by dsamain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,11 @@ namespace ft {
 			typedef value_type first_argument_type;
 			typedef value_type second_argument_type;
 			bool operator() (const value_type &x, const value_type &y) const {return comp(x.first, y.first);}
-			value_compare(const key_compare &c = Compare()) : comp(c) {}//std::cout << "normal called" << std::endl;}
-			value_compare(const value_compare &cpy) : comp(cpy.comp) {}//std::cout << "called" << std::endl;}
+			value_compare(const key_compare &c = Compare()) : comp(c) {}
+			value_compare(const value_compare &cpy) : comp(cpy.comp) {}
 		protected:
 			Compare comp;
 		};
-
-		//typedef map_rev_iterator<iterator> reverse_iterator;
-		//typedef map_rev_iterator<const_iterator> const_reverse_iterator;	
 
 	private:
 		typedef tree<value_type, value_compare, allocator_type> tree_type;
@@ -66,8 +63,7 @@ namespace ft {
 
 		explicit map(const key_compare &comp = key_compare(),
               const allocator_type &alloc = allocator_type())
-		: _alloc(alloc), _keyComp(comp), _comp(comp), _tree(value_compare(comp)) {
-		}		
+		: _alloc(alloc), _keyComp(comp), _comp(comp), _tree(value_compare(comp)) {}		
 
 		template <class InputIterator>
   		map (InputIterator first, InputIterator last,
@@ -136,21 +132,29 @@ namespace ft {
 		}
 
 		template <class InputIterator>
-  		void insert (InputIterator first, InputIterator last) {while (first != last) insert(*first++);}
+  		void insert (InputIterator first, InputIterator last) {
+			  while (first != last) insert(*first++);
+		}
 
-		void erase (iterator position) {erase(position->first);}
+		void erase (iterator position) {
+			erase(position->first);
+		}
 
 		size_type erase( const Key& key ) {
 			return _tree.erase(ft::make_pair(key, mapped_type()));
 		}
 
-		void erase (iterator first, iterator last) {while (first != last) erase(first++);}
+		void erase (iterator first, iterator last) {
+			while (first != last) erase(first++);
+		}
 
 		void swap (map &x) {
 			_tree.swap(x._tree);
 		}
 
-		friend void swap (map &x, map &y) {x.swap(y);}
+		friend void swap (map &x, map &y) {
+			x.swap(y);
+		}
 
 		void clear() {
 			_tree.clear();
@@ -173,7 +177,9 @@ namespace ft {
 		return _tree.find(ft::make_pair(k, mapped_type()));
 	}
 
-	size_type count (const key_type& k) const {return (find(k) != end());}
+	size_type count (const key_type& k) const {
+		return (find(k) != end());
+	}
 
 	iterator lower_bound (const key_type& k) {
 		return _tree.lower_bound(ft::make_pair(k, mapped_type()));
@@ -190,12 +196,18 @@ namespace ft {
 		return _tree.upper_bound(ft::make_pair(k, mapped_type()));
 	}
 
-	pair<iterator,iterator>             equal_range (const key_type& k) {return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));}
-	pair<const_iterator,const_iterator> equal_range (const key_type& k) const  {return ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k));}
+	pair<iterator,iterator> equal_range (const key_type& k) {
+		return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));
+	}
+	pair<const_iterator,const_iterator> equal_range (const key_type& k) const  {
+		return ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k));
+	}
+
 
 	/*------------------Allocator------------------*/
 
 	allocator_type get_allocator() const;
+
 
 	/*------------------Comparaison------------------*/
 
