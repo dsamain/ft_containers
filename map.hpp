@@ -6,7 +6,7 @@
 /*   By: dsamain <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/03 11:36:16 by dsamain           #+#    #+#             */
-/*   Updated: 2022/07/09 00:08:58 by dsamain          ###   ########.fr       */
+/*   Updated: 2022/07/10 07:23:25 by dsamain          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,7 @@ namespace ft {
 
 		ft::pair<iterator, bool> insert(const value_type &val) {
 			ft::pair<typename tree_type::nodePtr, bool> ret = _tree.insert(val);
-			return ft::make_pair(iterator(ret.first, _tree.getlast()), ret.second);
+			return ft::make_pair(iterator(ret.first, _tree.getLast()), ret.second);
 		}
 
 		iterator insert (iterator position, const value_type& val) {

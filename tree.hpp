@@ -274,13 +274,13 @@ template<typename T, typename Alloc = std::allocator<T> >
 			}
 			node = insert_child(parent, newNode(val));
 
-			InsertFix(node);
+			insertFix(node);
 
 			return ft::make_pair(node, true);
 		}
 
 		// Red-Black tree insertFix
-		void InsertFix(nodePtr node) {
+		void insertFix(nodePtr node) {
 			if (!node->par || !node->par->par) 
 				return;
 			while (node->par && node->par->col == RED) {
@@ -537,7 +537,7 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 	/*------------------Guetter------------------*/
 
-	nodePtr getlast() {return &_last;};
+	nodePtr getLast() {return &_last;};
 	nodePtr getRoot() {return _root;};
 
 
@@ -545,49 +545,49 @@ template<typename T, typename Alloc = std::allocator<T> >
 
 		void print(const std::string &prefix, nodePtr node, bool isLeft = 0)
 		{
-			if (!node) return;
+			if (!node || node == &_last) return;
 
 			std::cout << prefix;
         	std::cout << (isLeft ? "├──" : "└──" );
 
-        	std::cout << node->val->first <<  (node->col == BLACK ? "(B)" : "(R)") << std::endl;
+			std::cout << (node->col == BLACK ? "\033[1;90m" : "\033[1;31m") << *node->val << "\033[0m" << std::endl;
 
         	print(prefix + (isLeft ? "│   " : "    "), node->left, true);
         	print(prefix + (isLeft ? "│   " : "    "), node->right, false);
 		}
 
 		void checkValid() {
-
+			std::cout << "Check valid called : ";
 			int minDepth = 2147483647, maxDepth = 0;
-			checkValidDfs(_root, 0, minDepth, maxDepth);
+			if (!checkValidDfs(_root, 0, minDepth, maxDepth))
+				return;
 
-			if (maxDepth != minDepth) {
+			if (maxDepth != minDepth)
 				std::cout << "BLACK depth rule violoated" << std::endl;
-				std::cout << "minDepth: " << minDepth << std::endl;
-				std::cout << "maxDepth: " << maxDepth << std::endl;
-				std::cout << "tree : " << std::endl;
-				print("", _root, 0);
-
-			}
+			else
+				std::cout << "\033[1;32mOK\033[0m\n";
 		}
 
-		void checkValidDfs(nodePtr node, int depth, int &minDepth, int &maxDepth) {
+		int checkValidDfs(nodePtr node, int depth, int &minDepth, int &maxDepth) {
 			depth += (!node || node->col == BLACK);
 			if (!node || node == &_last) {
 				minDepth = ft::min(minDepth, depth);
 				maxDepth = ft::max(maxDepth, depth);
-				return;
+				return 1;
 			}
 
 			if (node->col == RED) {
 				if ((node->left && node->left->col== RED)
 					|| (node->right && node->right->col== RED)) {
 					std::cout << "RED rule violated" << std::endl;
+					return 0;
 				}
 			}
 
-			checkValidDfs(node->left, depth , minDepth, maxDepth);
-			checkValidDfs(node->right, depth , minDepth, maxDepth);
+			if (!checkValidDfs(node->left, depth , minDepth, maxDepth)
+				|| !checkValidDfs(node->right, depth , minDepth, maxDepth))
+				return 0;
+			return 1;
 		}
 
 
@@ -596,7 +596,6 @@ template<typename T, typename Alloc = std::allocator<T> >
 		Alloc _alloc;
 		std::allocator<node_type> _nodeAlloc;
 		node_type _last;
-	public:
 		node<value_type> *_root;
 		value_compare _comp;
 

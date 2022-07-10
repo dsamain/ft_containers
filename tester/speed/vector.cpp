@@ -5,12 +5,17 @@ int main(int ac, char **av) {
     srand(seed);
     double time = 0;
 
-    std::cout << "construct with 10000000 elem : ";
+    std::cout << "construct with 100000000 elem : ";
     ns::vector<int> v(10000000, 1);
     putTime(time);
 
-    std::cout << "inserting 10000000 more elem : ";
-    v.insert(v.begin() + 50000, 10000000, 42);
+	std::cout << "inserting 5 at random places: ";
+	for (int i = 0; i < 5; i++)
+		v.insert(v.begin() + rand() % v.size(), 42);
+    putTime(time);
+
+    std::cout << "inserting 100000000 more elem in the middle: ";
+    v.insert(v.begin() + 50000, 100000000, 42);
     putTime(time);
 
     std::cout << "pop_back() everything() : ";
@@ -21,15 +26,15 @@ int main(int ac, char **av) {
     for (int i = 0; i < 10000000; i++) v.push_back(rand());
     putTime(time);
 
-    std::cout << "Assign 3000000 elem : ";
-    v.assign(3000000, 42);
+    std::cout << "Assign 30000000 elem : ";
+    v.assign(30000000, 42);
     putTime(time);
 
     std::cout << "Resize v.size() * 10 : ";
     v.resize(v.size() * 10);
     putTime(time);
 
-    std::cout << "clear() :";
+    std::cout << "clear() : ";
     v.clear();
     putTime(time);
 

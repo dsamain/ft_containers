@@ -4,7 +4,11 @@
 #include <vector>
 #include "../map.hpp"
 #include <map>
+#include "../set.hpp"
+#include <set>
 #include "../pair.hpp"
+#include <stack>
+#include "../stack.hpp"
 
 #ifdef STD
 	#define ns std

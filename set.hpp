@@ -95,7 +95,7 @@ namespace ft {
 		ft::pair<iterator, bool> insert(const value_type &val) {
 
 			ft::pair<typename tree_type::nodePtr, bool> ret = _tree.insert(val);
-			return ft::make_pair(iterator(ret.first, _tree.getlast()), ret.second);
+			return ft::make_pair(iterator(ret.first, _tree.getLast()), ret.second);
 		}
 
 		iterator insert (iterator position, const value_type& val) {
@@ -189,6 +189,10 @@ namespace ft {
 	#ifdef DEBUG
 		void getRoot() {
 			_tree.getRoot();
+		}
+
+		void getLast() {
+			_tree.getLast();
 		}
 
 		void print() {

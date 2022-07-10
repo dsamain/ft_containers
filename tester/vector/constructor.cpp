@@ -1,10 +1,4 @@
-#include "utils.hpp"
-
-#ifdef STD
-	#define ns std
-#else
-	#define ns ft
-#endif
+#include "../utils.hpp"
 
 int main() {
 	{

@@ -1,6 +1,4 @@
-#include <iostream>
-#include "../stack.hpp"
-#include <stack>
+#include "../utils.hpp"
 
 #ifdef STD
 	#define ns std
